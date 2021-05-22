@@ -21,6 +21,9 @@ def get_distance_by_set(set_a : 'np.array', set_b : 'np.array') -> 'float':
 def get_sigma(distance, terminal_type = 'UWB') -> 'float' :
     return np.sqrt((1.0 + (distance / 7) ** 2) * (1 + type_factor_sigma[terminal_type]) + 1 * type_factor_sigma[terminal_type])
 
+def get_distance_from_origin_by_set(set : 'np.array'):
+    return math.sqrt((set[0]) ** 2 + (set[1]** 2))
+
 def get_distance_from_weak_terminal_by_coord(x : 'float', y : 'float', weak_terminal :'Terminal.CartesianPoint') -> 'float':
     return math.sqrt(((x-weak_terminal._x)**2)+((y-weak_terminal._y)**2))
 
@@ -118,5 +121,6 @@ def get_optimized_target(start_terminal : 'Terminal.CartesianPoint', end_termina
     shift_end_point = get_shift_coord_by_radius_and_degree(end_point, point_distance/2, shift_degree, mid_point)
     shift_start_point = get_shift_coord_by_radius_and_degree(start_point, point_distance/2, shift_degree, mid_point)
     intersection = get_ll_intersection(start_terminal_point, shift_start_point, end_terminal_point, shift_end_point)
-    print("!!!!!!!!!!", start_point, end_point)
     return ([shift_start_point, shift_end_point, intersection])
+
+

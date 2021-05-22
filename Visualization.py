@@ -2,93 +2,130 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as stats
 import math
+import seaborn as sns
 import Calculation
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 import GenNorm
 import Terminal
 import AxesFrame
-import random
 
-def get_random_hex_color() -> 'str':
-    colorArr = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
-    color = ""
-    for i in range(6):
-        color += colorArr[random.randint(0, 14)]
-    return "#" + color
 
-def draw_variance_demo():
-    x = np.linspace(0, 30, 100)
-    ax1.plot(x, (Calculation.get_sigma(x)**2), label = "UWB", color = "blue")
-    ax1.plot(x, (Calculation.get_sigma(x, "BlueTooth")**2), label="BlueTooth", color = 'red')
-    ax1.legend()
-    ax1.xaxis.grid(True, which='major', linestyle=(0, (8, 4)))
-    ax1.yaxis.grid(True, which='major', linestyle=(0, (8, 4)))
-    ax1.set_xlabel("Distance(cm)", fontsize=12)
-    ax1.set_ylabel("Sigma", fontsize=12)
-    ax1.set_title("Sigma Curve", fontsize=12, fontweight='light')
+def draw_compare_error_fix_point(ax, time : 'int', point_number : 'int', terminalA : 'Terminal.CartesianPoint', terminalB : 'Terminal.CartesianPoint',
+                       target : 'Terminal.CartesianPoint', step : 'int' = "1"): # 1, same time, diff mpoint
+    x = np.linspace(0, time+5, 100)
+    y = np.linspace(-5, 5, 200)
+    step_count = 1
+    # former_exp_x = 0
+    # former_exp_y = 0
+    # former_opt_x = 0
+    # former_opt_y = 0
+    former_exp = np.array([0,0])
+    former_opt = np.array([0,0])
+    exp_sum = 0
+    opt_sum = 0
+    for _ in range(int(time/step)): #20/1
+        exp_dis = 0
+        opt_dis = 0
+        round_count = 0
+        for __ in range(step_count):
+            round_count = __ + 1
+            setA = GenNorm.gen_normal_point(point_number, terminalA, target)
+            setB = GenNorm.gen_normal_point(point_number, terminalB, target)
+            exp_dis += (Calculation.get_distance_from_origin_by_set(Calculation.get_ideal_coord_by_set(setA)) + Calculation.get_distance_from_origin_by_set(Calculation.get_ideal_coord_by_set(setB)))/2
 
-def draw_distribution_demo_by_distance(distance: 'float'):
-    mu = 0
-    UWB_sigma = Calculation.get_sigma(distance, "UWB")
-    BT_sigma = Calculation.get_sigma(distance, "BlueTooth")
-    #sigma = math.sqrt(variance)
-    x = np.linspace(-10, 10, 100)
-    ax2.plot(x, stats.norm.pdf(x, mu, UWB_sigma), label = "UWB", color = "blue")
-    ax2.plot(x, stats.norm.pdf(x, mu, BT_sigma), label = "BlueTooth", color = 'red')
-    ax2.legend()
-    ax2.xaxis.grid(True, which='major')
-    ax2.yaxis.grid(True, which='major')
-    ax2.set_xlabel("Error Distance(cm)", fontsize=12)
-    ax2.set_ylabel("Probability(%)", fontsize=12)
-    ax2.set_title("Point Distribution(10cm)", fontsize=12, fontweight='light')
+            op_set = Calculation.get_optimized_target(terminalA,
+                                                      terminalB,
+                                                      Calculation.get_ideal_coord_by_set(
+                                                          Calculation.get_modified_coord_by_nor_set_and_terminal(setA,
+                                                                                                                 terminalA)),
+                                                      Calculation.get_ideal_coord_by_set(
+                                                          Calculation.get_modified_coord_by_nor_set_and_terminal(setB,
+                                                                                                                 terminalB))
+                                                      )
+            opt_dis += Calculation.get_distance_from_origin_by_set(op_set[2])
+        step_count += step
+        exp_dis /= round_count
+        opt_dis /= round_count
+        exp_sum += exp_dis
+        opt_sum += opt_dis
+        if _ == 0 :
+            ax.scatter(_*step, exp_dis, alpha=0.45, c = "b", label = "exp_err")
+            ax.scatter(_*step, opt_dis, alpha=0.45, c = "r", label = "opt_err")
+        else:
+            ax.scatter(_*step, exp_dis, alpha=0.45, c = "b", s = [60])
+            ax.scatter(_*step, opt_dis, alpha=0.45, c = "r", s = [60])
 
-def draw_main_axes(main_axes):
-    x = np.linspace(0, 50, 100)
-    #ax3.scatter(main_axes._initiator._x, main_axes._initiator._x, None, 'blue')
-    #ax3.scatter(main_axes._weak_terminal._x, main_axes._weak_terminal._y, None, 'red')
-    # normal_set = GenNorm.gen_normal_point(50, main_axes._initiator, main_axes._weak_terminal)
-    # for x in range(normal_set.shape[0]):
-    #     ax3.scatter(normal_set[x, 0], normal_set[x, 1], c = 'g', s = 50*Calculation.get_distance_from_weak_terminal_by_coord(normal_set[x, 0], normal_set[x, 1], main_axes._weak_terminal), alpha=0.3)
-    #     print("[Data] NormalPoint:" + str(10*Calculation.get_distance_from_weak_terminal_by_coord(normal_set[x, 0], normal_set[x, 1], main_axes._weak_terminal)))
-    # draw_scatter_by_terminal(ax3, 50, main_axes._initiator, main_axes._weak_terminal)
-    ax3.xaxis.grid(True, which='major', linestyle=(0, (8, 4)))
-    ax3.yaxis.grid(True, which='major', linestyle=(0, (8, 4)))
-    ax3.set_xlabel("X axis(cm)", fontsize=12)
-    ax3.set_ylabel("Y axis(cm)", fontsize=12)
-    ax3.set_title("Measuring Distribution", fontsize=12, fontweight='light')
-
-def draw_terminal_circle(ax, terminal : 'Terminal.CartesianPoint', color : 'str', alpha : 'float'):
-    out_area = [250]
-    inner_area = [65]
-    ax.scatter(terminal._x, terminal._y, s=out_area, color = color, alpha=alpha, edgecolors=color, linewidths=[1])
-    ax.scatter(terminal._x, terminal._y, s=inner_area, color=color, edgecolors=color, label = terminal._terminal_name)
+            ax.plot(np.array([former_exp[0], _*step]), np.array([former_exp[1], exp_dis]), c="b", ls = "--")
+            ax.plot(np.array([former_opt[0], _*step]), np.array([former_opt[1], opt_dis]), c="r")
+        former_exp = np.array([_*step, exp_dis])
+        former_opt = np.array([_*step, opt_dis])
+    ax.axhline(y = exp_sum/(time/step), c='b', ls='--', lw=2,
+               alpha=0.7,
+               label="avr_exp_err")
+    ax.axhline(y = opt_sum/(time/step), c='r', ls='-', lw=2,
+               alpha=0.7,
+               label="avr_opt_err")
+    ax.xaxis.grid(True, which='major', linestyle=(0, (8, 4)))
+    ax.yaxis.grid(True, which='major', linestyle=(0, (8, 4)))
+    #ax.set_xlabel("Measure Round", fontsize=12)
+    ax.set_ylabel("Error Distance", fontsize=12)
+    ax.set_title("round: " + str(time) + " point: " + str(point_number) + " step: " + str(step))
     ax.legend()
 
-def draw_scatter_by_terminal(ax, number : 'int', terminal : 'Terminal.CartesianPoint', target_terminal : 'Terminal.CartesianPoint', edgecolor : 'str' = 'blue'):
-    normal_set = GenNorm.gen_normal_point(number, terminal, target_terminal)
-    for x in range(normal_set.shape[0]):
-        ax.scatter(normal_set[x, 0], normal_set[x, 1], c = 'slateblue', s = 50*Calculation.get_distance_from_weak_terminal_by_coord(normal_set[x, 0], normal_set[x, 1], target_terminal), alpha=0.3, edgecolors=edgecolor, linewidths=[1])
-        print("[Data] Distance:" + str(10*Calculation.get_distance_from_weak_terminal_by_coord(normal_set[x, 0], normal_set[x, 1], target_terminal)))
+def draw_compare_error_fix_time(ax, time : 'int', point_number : 'int', terminalA : 'Terminal.CartesianPoint', terminalB : 'Terminal.CartesianPoint',
+                       target : 'Terminal.CartesianPoint', step : 'int' = "1"):
+    x = np.linspace(0, time+5, 100)
+    y = np.linspace(-5, 5, 200)
+    step_count = 1
+    # former_exp_x = 0
+    # former_exp_y = 0
+    # former_opt_x = 0
+    # former_opt_y = 0
+    former_exp = np.array([0,0])
+    former_opt = np.array([0,0])
+    exp_sum = 0
+    opt_sum = 0
+    for _ in range(int(point_number/step)): #20/1
+        exp_dis = 0
+        opt_dis = 0
+        #round_count = 0
+        for __ in range(time):
+            #round_count = __ + 1
+            setA = GenNorm.gen_normal_point(_+1, terminalA, target)
+            setB = GenNorm.gen_normal_point(_+1, terminalB, target)
+            exp_dis += (Calculation.get_distance_from_origin_by_set(Calculation.get_ideal_coord_by_set(setA)) + Calculation.get_distance_from_origin_by_set(Calculation.get_ideal_coord_by_set(setB)))/2
 
-def draw_terminal_circle_all(ax, main_axes :'AxesFrame.Axes'):
-    out_area = [250]
-    inner_area = [65]
-    for key in main_axes._terminal_set:
-        ax.scatter(main_axes._terminal_set[key]._x, main_axes._terminal_set[key]._y, s=out_area, color = "crimson", alpha=0.4, linewidths=[1])
-        ax.scatter(main_axes._terminal_set[key]._x, main_axes._terminal_set[key]._y, s=inner_area, label=main_axes._terminal_set[key]._terminal_name)
+            op_set = Calculation.get_optimized_target(terminalA,
+                                                      terminalB,
+                                                      Calculation.get_ideal_coord_by_set(
+                                                          Calculation.get_modified_coord_by_nor_set_and_terminal(setA,
+                                                                                                                 terminalA)),
+                                                      Calculation.get_ideal_coord_by_set(
+                                                          Calculation.get_modified_coord_by_nor_set_and_terminal(setB,
+                                                                                                                 terminalB))
+                                                      )
+            opt_dis += Calculation.get_distance_from_origin_by_set(op_set[2])
+        step_count += step
+        exp_dis /= time
+        opt_dis /= time
+        exp_sum += exp_dis
+        opt_sum += opt_dis
+        if _ == 0 :
+            ax.scatter(_*step, exp_dis, alpha=0.45, c = "b", label = "exp_err")
+            ax.scatter(_*step, opt_dis, alpha=0.45, c = "r", label = "opt_err")
+        else:
+            ax.scatter(_*step, exp_dis, alpha=0.45, c = "b", s = [60])
+            ax.scatter(_*step, opt_dis, alpha=0.45, c = "r", s = [60])
+
+            ax.plot(np.array([former_exp[0], _*step]), np.array([former_exp[1], exp_dis]), c="b", ls = "--")
+            ax.plot(np.array([former_opt[0], _*step]), np.array([former_opt[1], opt_dis]), c="r")
+        former_exp = np.array([_*step, exp_dis])
+        former_opt = np.array([_*step, opt_dis])
+    #ax.axhline(y = exp_sum/(time/step), c='b', ls='--', lw=2,alpha=0.7,label="avr_exp_err")
+    #ax.axhline(y = opt_sum/(time/step), c='r', ls='-', lw=2,alpha=0.7,label="avr_opt_err")
+    ax.xaxis.grid(True, which='major', linestyle=(0, (8, 4)))
+    ax.yaxis.grid(True, which='major', linestyle=(0, (8, 4)))
+    #ax.set_xlabel("Measure Number", fontsize=12)
+    ax.set_ylabel("Error Distance", fontsize=12)
+    ax.set_title("round: " + str(time) + " point: " + str(point_number) + " step: " + str(step))
     ax.legend()
-
-fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
-weak = Terminal.CartesianPoint(5, 5, "BlueTooth", "weak_terminal")
-main_axes = AxesFrame.Axes(weak)
-draw_variance_demo()
-draw_distribution_demo_by_distance(10)
-draw_main_axes(main_axes)
-# draw_terminal_circle(ax3, main_axes._initiator, 'blue', 0.3)
-# draw_terminal_circle(ax3, main_axes._weak_terminal, 'red', 0.3)
-draw_scatter_by_terminal(ax3, 20, main_axes._initiator, main_axes._weak_terminal)
-main_axes.add_terminal(Terminal.CartesianPoint(10, 3, "UWB", "terminalB"))
-draw_scatter_by_terminal(ax3, 10, main_axes._terminal_set["terminalB"], main_axes._weak_terminal)
-draw_terminal_circle_all(ax3, main_axes)
-
-plt.show()
