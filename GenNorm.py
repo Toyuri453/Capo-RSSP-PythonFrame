@@ -14,8 +14,7 @@ def gen_normal_point(point_number : 'int', terminal : 'Terminal.CartesianPoint',
     for x in range(normal_set.shape[0]):
         normal_set[x, 0] = target_terminal._x + np.random.normal(mu, math.sqrt(sigma))
         normal_set[x, 1] = target_terminal._y + np.random.normal(mu, math.sqrt(sigma))
-    print("@@@@@@@@@@@@@@@@@@@@",np.random.normal(mu, math.sqrt(sigma)))
-    print("[DATA] %sPointSetGenerated" %point_number)
+    print("[DATA] %s PointSetGenerated As:" %point_number)
     print(normal_set)
     return normal_set
 

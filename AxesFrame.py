@@ -11,6 +11,7 @@ class Axes():
         print(self._terminal_set)
 
     def add_terminal(self, terminal : 'Terminal.CartesianPoint'):
+        print("[DATA] Add Terminal {0} ".format(terminal))
         self._terminal_set[terminal._terminal_name] = terminal
 
     def show_terminal_names(self):

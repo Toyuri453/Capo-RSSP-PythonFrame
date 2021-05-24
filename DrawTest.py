@@ -20,6 +20,21 @@ def draw_variance_demo():
     ax1.set_ylabel("Sigma", fontsize=12)
     ax1.set_title("Sigma Curve", fontsize=12, fontweight='light')
 
+def draw_variance_demo2(ax, terminalA, terminalB, weak):
+    x = np.linspace(0, 10, 100)
+    atw = Calculation.get_distance(terminalA, weak)
+    btw = Calculation.get_distance(terminalB, weak)
+    ax.scatter(atw, (Calculation.get_sigma(atw)**2), marker = "^", color = terminalA._terminal_color, s = [200], label = terminalA._terminal_name)
+    ax.scatter(btw, (Calculation.get_sigma(btw)**2), marker = "*", color = terminalB._terminal_color, s = [200], label = terminalB._terminal_name)
+    ax.plot(x, (Calculation.get_sigma(x)**2), label = "UWB", color = "blue")
+    ax.plot(x, (Calculation.get_sigma(x, "BlueTooth")**2), label="BlueTooth", color = 'red')
+    ax.legend()
+    ax.xaxis.grid(True, which='major')
+    ax.yaxis.grid(True, which='major')
+    ax.set_xlabel("Distance(cm)", fontsize=12)
+    ax.set_ylabel("Sigma", fontsize=12)
+    ax.set_title("Sigma Curve", fontsize=12, fontweight='light')
+
 def draw_distribution_demo_by_distance(distance : 'float', fname : 'str', sname : 'str', marker : "str"):
     mu = 0
     UWB_sigma = Calculation.get_sigma(distance, "UWB")
@@ -159,7 +174,7 @@ def draw_shift_parm_contour_demo(ax):
     X, Y = np.meshgrid(x, y)
     Z = (X ** 2) * (5*Y / 2)
     con = ax.contourf(X, Y, Z, 50, cmap='RdPu')
-    con = ax.contourf(X, Y, Z, 50, cmap='viridis')
+    #con = ax.contourf(X, Y, Z, 50, cmap='viridis')
     ax.set_xlabel("Mod-Dis Ratio", fontsize=12)
     ax.set_ylabel("Angle Diff", fontsize=12)
     fig.colorbar(con, ax=ax)
@@ -205,8 +220,9 @@ def draw_compare_error_fix_point(ax, time : 'int', point_number : 'int', termina
     ax.legend()
 
 fig, ((ax1, ax2, ax3, ax4),(ax5, ax6, ax7, ax8)) = plt.subplots(2,4,figsize=(17,10))
-fig1, (ax5,ax8) = plt.subplots(1,2)
-
+#fig1, (ax3, ax5,ax8) = plt.subplots(1,3)
+fig2, ((ax11, ax12, ax13)) = plt.subplots(1,3,figsize=(17,7))
+fig3, ((ax10, ax14)) = plt.subplots(1,2,figsize=(17,7))
 
 weak = Terminal.CartesianPoint(5, 5, "BlueTooth", "weak_terminal")
 main_axes = AxesFrame.Axes(weak)
@@ -220,11 +236,11 @@ draw_distribution_demo_by_distance(20, "UWB", "BlueTooth", "x")
 
 
 draw_main_axes(ax3)
-main_axes._terminal_set["initiator"]._terminal_color = "#fe5858"
-main_axes._terminal_set["weak_terminal"]._terminal_color = "#3968e9"
+#main_axes._terminal_set["initiator"]._terminal_color = "#fe5858"
+#main_axes._terminal_set["weak_terminal"]._terminal_color = "#3968e9"
 draw_scatter_by_terminal(ax3, 20, main_axes._initiator, main_axes._weak_terminal)
 main_axes.add_terminal(Terminal.CartesianPoint(12, 3, "UWB", "terminalB"))
-main_axes._terminal_set["terminalB"]._terminal_color = "#01a79d"
+#main_axes._terminal_set["terminalB"]._terminal_color = "#01a79d"
 #main_axes.add_terminal(Terminal.CartesianPoint(1, 7, "UWB", "terminalC"))
 draw_scatter_by_terminal(ax3, 10, main_axes._terminal_set["terminalB"], main_axes._weak_terminal)
 #draw_scatter_by_terminal(ax3, 10, main_axes._terminal_set["terminalC"], main_axes._weak_terminal)
@@ -266,10 +282,10 @@ draw_scatter_by_set(ax5, Calculation.get_ideal_coord_by_set(set1), "expect")
 draw_scatter_by_set(ax5, Calculation.get_ideal_coord_by_set(set), "expect")
 
 draw_modified_distance_demo(ax6, 50)
-print(math.degrees(math.acos(1.41421/2)))
+#print(math.degrees(math.acos(1.41421/2)))
 
 draw_shift_parm_contour_demo(ax7)
-print(Calculation.get_shift_coord_by_radius_and_degree(([0, 1]), 1, 45))
+#print(Calculation.get_shift_coord_by_radius_and_degree(([0, 1]), 1, 45))
 
 
 # circle1 = plt.Circle((0, 0), 1, color='r', fill = False)
@@ -304,10 +320,108 @@ draw_scatter_by_set(ax8, Calculation.get_ideal_coord_by_set(set1), "expect")
 draw_scatter_by_set(ax8, Calculation.get_ideal_coord_by_set(set), "expect")
 
 
-print(Calculation.get_degree_diff_by_vector(([1,1]), ([1,-1])))
+#print(Calculation.get_degree_diff_by_vector(([1,1]), ([1,-1])))
 
 # print(Calculation.get_distance_from_origin_by_set(Calculation.get_ideal_coord_by_set(GenNorm.gen_normal_point(3, main_axes._terminal_set["initiator"], main_axes._weak_terminal))))
 # print(Calculation.get_distance_from_origin_by_set(op_set[2]))
+for _ in range(100):
+    print("")
+for _ in range(2):
+    for __ in range (120):
+        print("#", end='')
+    print("")
+for _ in range(50):
+    print("#", end='')
+print("Presentation Start", end='')
+for _ in range(52):
+    print("#", end='')
+print("")
+for _ in range(2):
+    for __ in range (120):
+        print("#", end='')
+    print("")
 
+draw_variance_demo2(ax10, main_axes._terminal_set["initiator"], main_axes._terminal_set["terminalB"], main_axes._weak_terminal)
+
+draw_main_axes(ax11)
+set1 = draw_scatter_by_terminal(ax11, 10, main_axes._initiator, main_axes._weak_terminal)
+set = draw_scatter_by_terminal(ax11, 10, main_axes._terminal_set["terminalB"], main_axes._weak_terminal)
+draw_terminal_circle_all(ax11, main_axes)
+main_axes.show_terminal_names()
+draw_line_between_terminal(ax11, main_axes._initiator, main_axes._terminal_set['terminalB'])
+#Calculation.get_modified_distance_by_set_and_type(set)
+
+for _ in range(1):
+    for __ in range (120):
+        print("@", end='')
+    print("")
+for _ in range(27):
+    print("@", end='')
+print("Point Set Generated, Starting Calculate Modified Point", end='')
+for _ in range(39):
+    print("@", end='')
+print("")
+for _ in range(1):
+    for __ in range (120):
+        print("@", end='')
+    print("")
+
+draw_main_axes(ax12)
+draw_terminal_circle_all(ax12, main_axes)
+main_axes.show_terminal_names()
+draw_line_between_terminal(ax12, main_axes._initiator, main_axes._terminal_set['terminalB'])
+#Calculation.get_modified_distance_by_set_and_type(set)
+draw_scatter_by_terminal(ax12, 1, main_axes._terminal_set["terminalB"], main_axes._weak_terminal, Calculation.get_modified_coord_by_nor_set_and_terminal(set, main_axes._terminal_set["terminalB"]))
+draw_scatter_by_terminal(ax12, 1, main_axes._terminal_set["initiator"], main_axes._weak_terminal, Calculation.get_modified_coord_by_nor_set_and_terminal(set1, main_axes._terminal_set["initiator"]))
+draw_ideal_scatter_by_set(ax12, Calculation.get_ideal_coord_by_set(Calculation.get_modified_coord_by_nor_set_and_terminal(set, main_axes._terminal_set["terminalB"])), main_axes._terminal_set["terminalB"], main_axes._weak_terminal)
+draw_ideal_scatter_by_set(ax12, Calculation.get_ideal_coord_by_set(Calculation.get_modified_coord_by_nor_set_and_terminal(set1, main_axes._terminal_set["initiator"])), main_axes._terminal_set["initiator"], main_axes._weak_terminal)
+setA = Calculation.get_ideal_coord_by_set(Calculation.get_modified_coord_by_nor_set_and_terminal(set, main_axes._terminal_set["terminalB"]))
+setB = Calculation.get_ideal_coord_by_set(Calculation.get_modified_coord_by_nor_set_and_terminal(set1, main_axes._terminal_set["initiator"]))
+ax12.plot([setA[0], setB[0]],[setA[1], setB[1]], c = "crimson", ls = "--" )
+
+for _ in range(1):
+    for __ in range (120):
+        print("@", end='')
+    print("")
+for _ in range(27):
+    print("@", end='')
+print("Modified Point Generated, Starting Calculate Target Point", end='')
+for _ in range(36):
+    print("@", end='')
+print("")
+for _ in range(1):
+    for __ in range (120):
+        print("@", end='')
+    print("")
+
+draw_main_axes(ax13)
+draw_terminal_circle_all(ax13, main_axes)
+main_axes.show_terminal_names()
+draw_line_between_terminal(ax13, main_axes._initiator, main_axes._terminal_set['terminalB'])
+#Calculation.get_modified_distance_by_set_and_type(set)
+#draw_scatter_by_terminal(ax13, 1, main_axes._terminal_set["terminalB"], main_axes._weak_terminal, Calculation.get_modified_coord_by_nor_set_and_terminal(set, main_axes._terminal_set["terminalB"]))
+#draw_scatter_by_terminal(ax13, 1, main_axes._terminal_set["initiator"], main_axes._weak_terminal, Calculation.get_modified_coord_by_nor_set_and_terminal(set1, main_axes._terminal_set["initiator"]))
+#draw_ideal_scatter_by_set(ax13, Calculation.get_ideal_coord_by_set(Calculation.get_modified_coord_by_nor_set_and_terminal(set, main_axes._terminal_set["terminalB"])), main_axes._terminal_set["terminalB"], main_axes._weak_terminal)
+#draw_ideal_scatter_by_set(ax13, Calculation.get_ideal_coord_by_set(Calculation.get_modified_coord_by_nor_set_and_terminal(set1, main_axes._terminal_set["initiator"])), main_axes._terminal_set["initiator"], main_axes._weak_terminal)
+
+#ax12.plot([setA[0], setB[0]],[setA[1], setB[1]], c = "crimson", ls = "--" )
+op_set = Calculation.get_optimized_target(main_axes._terminal_set["initiator"],
+                                          main_axes._terminal_set["terminalB"],
+                                          setB,
+                                          setA
+                                          )
+
+draw_scatter_by_set(ax13, op_set[0], "ideal")
+draw_scatter_by_set(ax13, op_set[1], "ideal")
+draw_scatter_by_set(ax13, op_set[2], "target")
+draw_scatter_by_set(ax13, Calculation.get_ideal_coord_by_set(set1), "expect")
+draw_scatter_by_set(ax13, Calculation.get_ideal_coord_by_set(set), "expect")
+ax13.plot([op_set[0][0], op_set[1][0]],[op_set[0][1], op_set[1][1]], c = "crimson", ls = "-" )
+ax13.plot([main_axes._terminal_set["initiator"]._x, op_set[2][0]],[main_axes._terminal_set["initiator"]._y, op_set[2][1]], c = main_axes._terminal_set["initiator"]._terminal_color, ls = "--" )
+ax13.plot([main_axes._terminal_set["terminalB"]._x, op_set[2][0]],[main_axes._terminal_set["terminalB"]._y, op_set[2][1]], c = main_axes._terminal_set["terminalB"]._terminal_color, ls = "--" )
+
+draw_shift_parm_contour_demo(ax14)
+ax14.scatter(op_set[3], op_set[4], marker="D", s=[80],
+           label="parm_lambda")
 
 plt.show()
