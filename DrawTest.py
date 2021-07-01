@@ -221,8 +221,9 @@ def draw_compare_error_fix_point(ax, time : 'int', point_number : 'int', termina
 
 fig, ((ax1, ax2, ax3, ax4),(ax5, ax6, ax7, ax8)) = plt.subplots(2,4,figsize=(17,10))
 #fig1, (ax3, ax5,ax8) = plt.subplots(1,3)
-fig2, ((ax11, ax12, ax13)) = plt.subplots(1,3,figsize=(17,7))
 fig3, ((ax10, ax14)) = plt.subplots(1,2,figsize=(17,7))
+fig2, ((ax11, ax12, ax13)) = plt.subplots(1,3,figsize=(17,7))
+
 
 weak = Terminal.CartesianPoint(5, 5, "BlueTooth", "weak_terminal")
 main_axes = AxesFrame.Axes(weak)
@@ -344,8 +345,8 @@ for _ in range(2):
 draw_variance_demo2(ax10, main_axes._terminal_set["initiator"], main_axes._terminal_set["terminalB"], main_axes._weak_terminal)
 
 draw_main_axes(ax11)
-set1 = draw_scatter_by_terminal(ax11, 10, main_axes._initiator, main_axes._weak_terminal)
-set = draw_scatter_by_terminal(ax11, 10, main_axes._terminal_set["terminalB"], main_axes._weak_terminal)
+set1 = draw_scatter_by_terminal(ax11, 15, main_axes._initiator, main_axes._weak_terminal)
+set = draw_scatter_by_terminal(ax11, 15, main_axes._terminal_set["terminalB"], main_axes._weak_terminal)
 draw_terminal_circle_all(ax11, main_axes)
 main_axes.show_terminal_names()
 draw_line_between_terminal(ax11, main_axes._initiator, main_axes._terminal_set['terminalB'])
@@ -421,7 +422,8 @@ ax13.plot([main_axes._terminal_set["initiator"]._x, op_set[2][0]],[main_axes._te
 ax13.plot([main_axes._terminal_set["terminalB"]._x, op_set[2][0]],[main_axes._terminal_set["terminalB"]._y, op_set[2][1]], c = main_axes._terminal_set["terminalB"]._terminal_color, ls = "--" )
 
 draw_shift_parm_contour_demo(ax14)
-ax14.scatter(op_set[3], op_set[4], marker="D", s=[80],
+ax14.scatter(op_set[3], op_set[4], marker="o", s=[80],
            label="parm_lambda")
+ax14.legend()
 
 plt.show()
