@@ -6,8 +6,14 @@ type_factor_sigma = {'UWB' : 0, 'BlueTooth' : 0.3}
 
 def get_distance(terminalA : 'Terminal.CartesianPoint', terminalB : 'Terminal.CartesianPoint'):
     #print(terminalA._x, terminalB._x, terminalA._y, terminalB._y)
-    print("[DATA] Get Distance :" + terminalA._terminal_name + ": " , terminalA._x , terminalA._y , terminalB._terminal_name + ": " , terminalB._x , terminalB._y , "Dis: ", ((terminalA._x-terminalB._x)**2)+((terminalA._y-terminalB._y)**2))
-    return math.sqrt( ((terminalA._x-terminalB._x)**2)+((terminalA._y-terminalB._y)**2) )
+    dis = math.sqrt( ((terminalA._x-terminalB._x)**2)+((terminalA._y-terminalB._y)**2) )
+    print("[DATA] Get Distance :" + terminalA._terminal_name + ": " , terminalA._x , terminalA._y , terminalB._terminal_name + ": " , terminalB._x , terminalB._y , "Dis: ", dis)
+    return dis
+
+def get_distance_sq(terminalA : 'Terminal.CartesianPoint', terminalB : 'Terminal.CartesianPoint'):
+    #print(terminalA._x, terminalB._x, terminalA._y, terminalB._y)
+    print("[DATA] Get Squared Distance :" + terminalA._terminal_name + ": " , terminalA._x , terminalA._y , terminalB._terminal_name + ": " , terminalB._x , terminalB._y , "Dis: ", ((terminalA._x-terminalB._x)**2)+((terminalA._y-terminalB._y)**2))
+    return ((terminalA._x-terminalB._x)**2)+((terminalA._y-terminalB._y)**2)
 
 def get_distance_from_origin(terminal : 'Terminal.CartesianPoint'):
     return math.sqrt((terminal._x**2)+(terminal._y**2))
